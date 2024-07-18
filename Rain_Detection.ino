@@ -3,14 +3,14 @@
 String _buffer;
 String number = "+918482878905";
 
-#define LIQUID_SENSOR A1
+#define Rain_SENSOR A1
 
-int liquid_value = 0;
+int rain_value = 0;
 
-int liquid_default = 100;
-//liquid_flag = 0 means liquid not detected
-//liquid_flag = 1 means liquid is detected
-boolean liquid_flag = 0;
+int rain_default = 100;
+//rain_flag = 0 means rain not detected
+//rain_flag = 1 means rain is detected
+boolean rain_flag = 0;
 
 SoftwareSerial mySerial(2, 3);
 
@@ -23,7 +23,7 @@ void setup()
   Serial.begin(9600);
   //Begin serial communication: Arduino IDE (Serial Monitor)
 
-  pinMode(LIQUID_SENSOR, INPUT);
+  pinMode(Rain_SENSOR, INPUT);
   pinMode(BUZZER_PIN, OUTPUT);
   //by default the BUZZER is OFF
   digitalWrite(BUZZER_PIN, LOW); 
@@ -42,26 +42,26 @@ void loop()
     Serial.println(mySerial.readString());
   }
 
-  liquid_value = analogRead(LIQUID_SENSOR);
-  liquid_value = map(liquid_value, 0, 1023, 225, 0);
-  Serial.println(liquid_value);
-  //The liquid is detected, trigger Alarm and send sms
-  if (liquid_value >= liquid_default) {
+  rain_value = analogRead(Rain_SENSOR);
+  rain_value = map(rain_value, 0, 1023, 225, 0);
+  Serial.println(rain_value);
+  //The rain is detected, trigger Alarm and send sms
+  if (rain_value >= rain_default) {
     digitalWrite(BUZZER_PIN, HIGH);
-    liquid_flag = 1;
-    if (liquid_flag == 1) {
-      Serial.println("Liquid is Detected.");
+    rain_flag = 1;
+    if (rain_flag == 1) {
+      Serial.println("Rain is Detected.");
       send_sms();
       make_call();
-      liquid_flag = 0;
+      rain_flag = 0;
 
     }
   }
-  //No liquid is detected, turn OFF Alarm
+  //No rain is detected, turn OFF Alarm
   else {
     digitalWrite(BUZZER_PIN, LOW);
-    if (liquid_flag == 0) {
-      Serial.println("Liquid is not Detected.");
+    if (rain_flag == 0) {
+      Serial.println("Rain is not Detected.");
     }
   }
 
@@ -82,7 +82,7 @@ void send_sms()
   delay(1000);
   mySerial.print("AT+CMGS=\"" + number + "\"\r");
   delay(1000);
-  mySerial.print("Liquid has been detected");
+  mySerial.print("Rain has been detected");
   delay(100);
   mySerial.write(26); //ascii code for ctrl-26 //Serial2.println((char)26); //ascii code for ctrl-26
   delay(5000);
